@@ -1,0 +1,6 @@
+torch
+transformers
+accelerate
+soundfile
+librosa
+streamlit
