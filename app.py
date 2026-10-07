@@ -32,6 +32,12 @@ def load_speech_pipeline():
         torch_dtype=torch_dtype,
         device=device,
     )
+
+    # Bypass the generation config bug by forcing the language at the model config level
+    pipe.model.config.forced_decoder_ids = pipe.tokenizer.get_decoder_prompt_ids(
+        language="ta", task="transcribe"
+    )
+
     return pipe
 
 # Safely initialize the pipeline
@@ -61,10 +67,8 @@ with col2:
                 with open(temp_filename, "wb") as f:
                     f.write(uploaded_file.getbuffer())
 
-                # Run the pipeline explicitly forcing Tamil text output
-                result = pipe(
-                    temp_filename, generate_kwargs={"language": "tamil", "task": "transcribe"}
-                )
+                # Run the pipeline (language is already forced in the model config)
+                result = pipe(temp_filename)
 
                 # Display final transcription output
                 st.text_area(
